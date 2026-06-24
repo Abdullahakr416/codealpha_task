@@ -1,0 +1,473 @@
+{
+  "name": "fittrack-ui",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.10.0",
+    "@radix-ui/react-alert-dialog": "^1.1.7",
+    "@radix-ui/react-dialog": "^1.1.7",
+    "@radix-ui/react-dropdown-menu": "^2.1.7",
+    "@radix-ui/react-label": "^2.1.3",
+    "@radix-ui/react-progress": "^1.1.3",
+    "@radix-ui/react-select": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.3",
+    "@radix-ui/react-slot": "^1.2.0",
+    "@radix-ui/react-toast": "^1.2.7",
+    "@radix-ui/react-tooltip": "^1.2.0",
+    "@tanstack/react-query": "^5.62.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.468.0",
+    "next-themes": "^0.4.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.55.0",
+    "recharts": "^2.15.2",
+    "tailwind-merge": "^2.5.5",
+    "tw-animate-css": "^1.4.0",
+    "wouter": "^3.3.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.5"
+  }
+}
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import path from "path";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
+  server: {
+    port: 5173,
+    proxy: {
+      "/api": "http://localhost:3001",
+    },
+  },
+});
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["src"]
+}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+import { createRoot } from "react-dom/client";
+import App from "./App";
+import "./index.css";
+
+createRoot(document.getElementById("root")!).render(<App />);
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Route, Switch } from "wouter";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { Layout } from "@/components/Layout";
+import { Toaster } from "@/components/ui/toaster";
+import Dashboard from "@/pages/Dashboard";
+import Activities from "@/pages/Activities";
+import Goals from "@/pages/Goals";
+import NotFound from "@/pages/not-found";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 1,
+    },
+  },
+});
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <Layout>
+          <Switch>
+            <Route path="/" component={Dashboard} />
+            <Route path="/activities" component={Activities} />
+            <Route path="/goals" component={Goals} />
+            <Route component={NotFound} />
+          </Switch>
+        </Layout>
+        <Toaster />
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+}
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  --font-sans: var(--app-font-sans);
+  --font-serif: var(--app-font-serif);
+  --font-mono: var(--app-font-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: 220 20% 97%;
+  --foreground: 222 30% 12%;
+  --border: 220 15% 88%;
+  --input: 220 15% 88%;
+  --ring: 22 95% 55%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 30% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 30% 12%;
+  --primary: 22 95% 55%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 15% 92%;
+  --secondary-foreground: 222 25% 25%;
+  --muted: 220 15% 94%;
+  --muted-foreground: 220 10% 50%;
+  --accent: 22 90% 95%;
+  --accent-foreground: 22 80% 35%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --sidebar: 222 30% 16%;
+  --sidebar-foreground: 220 20% 88%;
+  --sidebar-border: 222 25% 22%;
+  --sidebar-primary: 22 95% 55%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 222 25% 22%;
+  --sidebar-accent-foreground: 220 20% 88%;
+  --chart-1: 22 95% 55%;
+  --chart-2: 200 80% 50%;
+  --chart-3: 152 65% 45%;
+  --chart-4: 280 70% 60%;
+  --chart-5: 40 90% 55%;
+  --app-font-sans: "Inter", sans-serif;
+  --app-font-serif: Georgia, serif;
+  --app-font-mono: "JetBrains Mono", monospace;
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: 222 35% 9%;
+  --foreground: 220 20% 92%;
+  --border: 222 25% 18%;
+  --input: 222 25% 18%;
+  --ring: 22 95% 55%;
+  --card: 222 30% 12%;
+  --card-foreground: 220 20% 92%;
+  --popover: 222 30% 12%;
+  --popover-foreground: 220 20% 92%;
+  --primary: 22 95% 55%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 222 25% 18%;
+  --secondary-foreground: 220 20% 80%;
+  --muted: 222 25% 16%;
+  --muted-foreground: 220 15% 55%;
+  --accent: 22 60% 20%;
+  --accent-foreground: 22 90% 75%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --sidebar: 222 35% 7%;
+  --sidebar-foreground: 220 20% 88%;
+  --sidebar-border: 222 25% 14%;
+  --sidebar-primary: 22 95% 55%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 222 25% 14%;
+  --sidebar-accent-foreground: 220 20% 80%;
+  --chart-1: 22 95% 55%;
+  --chart-2: 200 80% 55%;
+  --chart-3: 152 65% 50%;
+  --chart-4: 280 70% 65%;
+  --chart-5: 40 90% 60%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+export type ActivityType =
+  | "running"
+  | "cycling"
+  | "swimming"
+  | "strength"
+  | "yoga"
+  | "walking"
+  | "hiit"
+  | "other";
+
+export interface Activity {
+  id: number;
+  name: string;
+  type: ActivityType;
+  date: string;
+  durationMinutes: number;
+  caloriesBurned: number;
+  steps: number | null;
+  distanceKm: number | null;
+  waterMl: number | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface ActivityInput {
+  name: string;
+  type: ActivityType;
+  date: string;
+  durationMinutes: number;
+  caloriesBurned: number;
+  steps?: number | null;
+  distanceKm?: number | null;
+  waterMl?: number | null;
+  notes?: string | null;
+}
+
+export interface Goals {
+  id: number;
+  dailySteps: number;
+  dailyCalories: number;
+  weeklyWorkouts: number;
+  dailyWaterMl: number;
+}
+
+export interface GoalProgress {
+  stepsPercent: number;
+  caloriesPercent: number;
+  workoutsPercent: number;
+  waterPercent: number;
+}
+
+export interface Dashboard {
+  todayCalories: number;
+  todaySteps: number;
+  todayWaterMl: number;
+  todayDurationMinutes: number;
+  weeklyWorkouts: number;
+  totalWorkouts: number;
+  totalCalories: number;
+  goalProgress: GoalProgress;
+  recentActivities: Activity[];
+}
+
+export interface DayStat {
+  date: string;
+  day: string;
+  calories: number;
+  durationMinutes: number;
+  workouts: number;
+  steps: number;
+}
+
+const BASE = "/api";
+const json = (res: Response) => {
+  if (!res.ok) throw new Error(res.statusText);
+  return res.json();
+};
+
+export const getListActivitiesQueryKey = () => ["activities"] as const;
+export const getGetActivityQueryKey = (id: number) =>
+  ["activities", id] as const;
+export const getGetGoalsQueryKey = () => ["goals"] as const;
+export const getGetDashboardQueryKey = () => ["dashboard"] as const;
+export const getGetWeeklyStatsQueryKey = () =>
+  ["dashboard", "weekly"] as const;
+
+export function useListActivities(
+  params?: { limit?: number; offset?: number },
+  options?: object
+) {
+  const qs = params
+    ? "?" + new URLSearchParams(params as Record<string, string>).toString()
+    : "";
+  return useQuery<Activity[]>({
+    queryKey: getListActivitiesQueryKey(),
+    queryFn: () => fetch(`${BASE}/activities${qs}`).then(json),
+    ...options,
+  });
+}
+
+export function useGetActivity(id: number, options?: object) {
+  return useQuery<Activity>({
+    queryKey: getGetActivityQueryKey(id),
+    queryFn: () => fetch(`${BASE}/activities/${id}`).then(json),
+    ...options,
+  });
+}
+
+export function useCreateActivity() {
+  const qc = useQueryClient();
+  return useMutation<Activity, Error, { data: ActivityInput }>({
+    mutationFn: ({ data }) =>
+      fetch(`${BASE}/activities`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).then(json),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: getListActivitiesQueryKey() });
+      qc.invalidateQueries({ queryKey: getGetDashboardQueryKey() });
+      qc.invalidateQueries({ queryKey: getGetWeeklyStatsQueryKey() });
+    },
+  });
+}
+
+export function useUpdateActivity() {
+  const qc = useQueryClient();
+  return useMutation<Activity, Error, { id: number; data: Partial<ActivityInput> }>({
+    mutationFn: ({ id, data }) =>
+      fetch(`${BASE}/activities/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).then(json),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: getListActivitiesQueryKey() });
+      qc.invalidateQueries({ queryKey: getGetDashboardQueryKey() });
+      qc.invalidateQueries({ queryKey: getGetWeeklyStatsQueryKey() });
+    },
+  });
+}
+
+export function useDeleteActivity() {
+  const qc = useQueryClient();
+  return useMutation<void, Error, { id: number }>({
+    mutationFn: ({ id }) =>
+      fetch(`${BASE}/activities/${id}`, { method: "DELETE" }).then(() => {}),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: getListActivitiesQueryKey() });
+      qc.invalidateQueries({ queryKey: getGetDashboardQueryKey() });
+      qc.invalidateQueries({ queryKey: getGetWeeklyStatsQueryKey() });
+    },
+  });
+}
+
+export function useGetGoals(options?: object) {
+  return useQuery<Goals>({
+    queryKey: getGetGoalsQueryKey(),
+    queryFn: () => fetch(`${BASE}/goals`).then(json),
+    ...options,
+  });
+}
+
+export function useUpdateGoals() {
+  const qc = useQueryClient();
+  return useMutation<Goals, Error, { data: Partial<Goals> }>({
+    mutationFn: ({ data }) =>
+      fetch(`${BASE}/goals`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).then(json),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: getGetGoalsQueryKey() });
+      qc.invalidateQueries({ queryKey: getGetDashboardQueryKey() });
+    },
+  });
+}
+
+export function useGetDashboard(options?: object) {
+  return useQuery<Dashboard>({
+    queryKey: getGetDashboardQueryKey(),
+    queryFn: () => fetch(`${BASE}/dashboard`).then(json),
+    ...options,
+  });
+}
+
+export function useGetWeeklyStats(options?: object) {
+  return useQuery<DayStat[]>({
+    queryKey: getGetWeeklyStatsQueryKey(),
+    queryFn: () => fetch(`${BASE}/dashboard/weekly`).then(json),
+    ...options,
+  });
+}
